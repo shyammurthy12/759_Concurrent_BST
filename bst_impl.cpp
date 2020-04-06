@@ -113,17 +113,17 @@ bool insert(int key)
 
       if(key<leaf->key)
       {
-        newInternal->left = newLeaf;
-        newInternal->right = leaf;
+        (newInternal->left).address = newLeaf;
+        (newInternal->right).address = leaf;
       }
       else
       {
-        newInternal->right = newLeaf;
-        newInternal->left = leaf;
+        (newInternal->right).address = newLeaf;
+        (newInternal->left).address = leaf;
       }
 
       //trying to add the new nodes to the tree
-      if(__sync_bool_compare_and_swap(childAddr->address, leaf, newInternal))
+      if(__sync_bool_compare_and_swap(&(childAddr->address), leaf, newInternal))
       {
         //insertion successful
         return true; 
