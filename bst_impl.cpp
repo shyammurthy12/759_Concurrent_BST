@@ -25,7 +25,7 @@ void initialConstruction()
   S->left.address = leaf1;
   S->left.flag = false;
   S->left.tag = false;
-  S->right.address = leaf1;
+  S->right.address = leaf2;
   S->right.flag = false;
   S->right.tag = false;
 
@@ -84,6 +84,69 @@ bool search (int key)
      return true;
   else
     return false;
+}
+
+bool insert(int key)
+{
+  seekRecord* temp;
+  temp = new seekRecord;
+  while(1)
+  {
+    seek(key,temp);
+    if(((temp->leaf)->key) != key)
+    {
+      //key is not present in the tree
+      node* parent = temp->parent;
+      node* leaf = temp->leaf;
+      
+      //obtain the address of the child field that needs to be modified
+      subNode* childAddr;
+      if(key < (parent->key))
+        childAddr = &(parent->left);
+      else
+        childAddr = &(parent->right);
+
+      node* newInternal = new node;
+      node* newLeaf = new node;
+      newLeaf->key = key;
+      newInternal->key = std::max(key,leaf->key);
+
+      if(key<leaf->key)
+      {
+        newInternal->left = newLeaf;
+        newInternal->right = leaf;
+      }
+      else
+      {
+        newInternal->right = newLeaf;
+        newInternal->left = leaf;
+      }
+
+      //trying to add the new nodes to the tree
+      if(__sync_bool_compare_and_swap(childAddr->address, leaf, newInternal))
+      {
+        //insertion successful
+        return true; 
+      }        
+      else
+      {
+        //insertion failed; help the conflicting delete operation
+        if((childAddr->address == leaf) && (childAddr->flag || childAddr->tag))
+        {
+          //address if the child has not changed and either the leaf node
+          //or its sibling has been flagged for deletion
+          
+          //Implemented as part of the delete operation
+          //cleanup();
+        } 
+      }
+    }
+    else
+    {
+      //key is already present in the tree
+      return false;
+    }  
+  }
 }
 
 int main()

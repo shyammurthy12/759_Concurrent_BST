@@ -1,4 +1,6 @@
 #include <iostream>
+#include <atomic>
+#include <algorithm>
 
 using namespace std;
 
@@ -39,4 +41,4 @@ node* R;
 
 void seek(int key, seekRecord* record);
 bool search (int key);
-
+bool insert(int key);
